@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mis Wao Waos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Caveat+Brush&display=swap" rel="stylesheet">
+  <link href="style.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="scrapbook-page">
+    <h1>Perritos Queridos ❤</h1>
+
+    <div class="top-bar">
+      <button id="themeToggle" aria-label="Toggle dark mode">🌙 Modo Oscuro</button>
+      <button id="showFormButton">➕ Agregar Perrito</button>
+    </div>
+
+    <div id="dogGallery" class="scrapbook-gallery">
+      <!-- Dog cards will appear here -->
+    </div>
+      <div id="formOverlay" class="form-overlay hidden">
+        <form id="dogForm" class="scrapbook-form">
+          <button type="button" id="closeForm" class="close-btn">×</button>
+          <h2>Otro Perrito !</h2>
+          <input type="text" id="name" placeholder="Nombre" required />
+          <input type="Date" id="birthdate" required />
+          <input type="file" id="photo" accept="image/*" />
+          <textarea id="funFacts" placeholder="Datos curiosos..."></textarea>
+          <label><input type="checkbox" id="passedAway" /> Falleció? :(</label>
+          <button type="submit">Guardar !</button>
+        </form>
+      </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
