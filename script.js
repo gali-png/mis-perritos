@@ -63,50 +63,43 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  function handleFormSubmit(e) {
-    e.preventDefault();
+ function handleFormSubmit(e) {
+  e.preventDefault();
 
-    const newDog = {
-      id: Date.now(), // Simple unique ID
-      name: document.getElementById('name').value,
-      birthdate: document.getElementById('birthdate').value,
-      passedAway: document.getElementById('passedAway').checked,
-      funFacts: document.getElementById('funFacts').value
-    };
-
-    // Handle photo upload
-    const photoInput = document.getElementById('photo');
-    if (photoInput.files && photoInput.files[0]) {
-      newDog.photo = URL.createObjectURL(photoInput.files[0]);
-    } else {
-      // Default dog image if none provided
-      newDog.photo = 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400&auto=format&fit=crop';
-    }
-
-    // Add new dog and save
-    dogs.push(newDog);
-    saveDogs();
-    renderDogGallery();
-
-    // Replace the photo handling code with:
-if (photoInput.files[0]) {
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    newDog.photo = e.target.result; // Stores as base64 string
-    dogs.push(newDog);
-    saveDogs();
-    renderDogGallery();
+  const newDog = {
+    id: Date.now(),
+    name: document.getElementById('name').value,
+    birthdate: document.getElementById('birthdate').value,
+    passedAway: document.getElementById('passedAway').checked,
+    funFacts: document.getElementById('funFacts').value
   };
-  reader.readAsDataURL(photoInput.files[0]);
-} else {
-  // Use default image
-}
 
-    // Reset and close form
-    dogForm.reset();
-    formOverlay.classList.remove('visible');
+  const photoInput = document.getElementById('photo');
+  
+  // If no photo selected, use default image
+  if (!photoInput.files || !photoInput.files[0]) {
+    newDog.photo = 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400&auto=format&fit=crop';
+    addDogAndSave(newDog);
+    return;
   }
 
+  // Process the image
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    newDog.photo = e.target.result;
+    addDogAndSave(newDog);
+  };
+  reader.readAsDataURL(photoInput.files[0]);
+}
+
+// New helper function
+function addDogAndSave(newDog) {
+  dogs.push(newDog);
+  saveDogs();
+  renderDogGallery();
+  dogForm.reset();
+  formOverlay.classList.remove('visible');
+}
   function renderDogGallery() {
     dogGallery.innerHTML = '';
 
