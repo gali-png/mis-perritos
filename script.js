@@ -88,6 +88,20 @@ document.addEventListener('DOMContentLoaded', function() {
     saveDogs();
     renderDogGallery();
 
+    // Replace the photo handling code with:
+if (photoInput.files[0]) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    newDog.photo = e.target.result; // Stores as base64 string
+    dogs.push(newDog);
+    saveDogs();
+    renderDogGallery();
+  };
+  reader.readAsDataURL(photoInput.files[0]);
+} else {
+  // Use default image
+}
+
     // Reset and close form
     dogForm.reset();
     formOverlay.classList.remove('visible');
