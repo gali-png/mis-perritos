@@ -30,14 +30,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Form buttons
     showFormBtn.addEventListener('click', () => {
-      formOverlay.classList.add('visible'); // Fixed typo: formOverlay (was formOverlay)
+      formOverlay.classList.add('visible');
     });
 
     closeFormBtn.addEventListener('click', () => {
       formOverlay.classList.remove('visible');
     });
 
-    // Form submission
+    // Form submission - ONLY ONE EVENT LISTENER
     dogForm.addEventListener('submit', handleFormSubmit);
 
     // Close overlay when clicking outside form
@@ -63,60 +63,52 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
- 
+  function handleFormSubmit(e) {
+    e.preventDefault();
+    
+    const submitBtn = dogForm.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    
+    const newDog = {
+      id: Date.now(),
+      name: document.getElementById('name').value,
+      birthdate: document.getElementById('birthdate').value,
+      passedAway: document.getElementById('passedAway').checked,
+      funFacts: document.getElementById('funFacts').value
+    };
 
-  // Process the image
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    newDog.photo = e.target.result;
-    addDogAndSave(newDog);
-  };
-  reader.readAsDataURL(photoInput.files[0]);
-}
+    const photoInput = document.getElementById('photo');
+    
+    if (!photoInput.files || !photoInput.files[0]) {
+      newDog.photo = 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400&auto=format&fit=crop';
+      addDogAndSave(newDog, submitBtn);
+      return;
+    }
 
-function handleFormSubmit(e) {
-  e.preventDefault();
-  
-  // Disable submit button to prevent double submissions
-  const submitBtn = dogForm.querySelector('button[type="submit"]');
-  submitBtn.disabled = true;
-  
-  const newDog = {
-    id: Date.now(),
-    name: document.getElementById('name').value,
-    birthdate: document.getElementById('birthdate').value,
-    passedAway: document.getElementById('passedAway').checked,
-    funFacts: document.getElementById('funFacts').value
-  };
-
-  const photoInput = document.getElementById('photo');
-  
-  if (!photoInput.files || !photoInput.files[0]) {
-    newDog.photo = 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400&auto=format&fit=crop';
-    addDogAndSave(newDog, submitBtn);
-    return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      newDog.photo = e.target.result;
+      addDogAndSave(newDog, submitBtn);
+    };
+    reader.onerror = function() {
+      newDog.photo = 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400&auto=format&fit=crop';
+      addDogAndSave(newDog, submitBtn);
+    };
+    reader.readAsDataURL(photoInput.files[0]);
   }
 
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    newDog.photo = e.target.result;
-    addDogAndSave(newDog, submitBtn);
-  };
-  reader.onerror = function() {
-    newDog.photo = 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400&auto=format&fit=crop';
-    addDogAndSave(newDog, submitBtn);
-  };
-  reader.readAsDataURL(photoInput.files[0]);
-}
+  function addDogAndSave(newDog, submitBtn) {
+    // Check for duplicate ID before adding
+    if (!dogs.some(dog => dog.id === newDog.id)) {
+      dogs.push(newDog);
+      saveDogs();
+      renderDogGallery();
+    }
+    dogForm.reset();
+    formOverlay.classList.remove('visible');
+    submitBtn.disabled = false;
+  }
 
-function addDogAndSave(newDog, submitBtn) {
-  dogs.push(newDog);
-  saveDogs();
-  renderDogGallery();
-  dogForm.reset();
-  formOverlay.classList.remove('visible');
-  submitBtn.disabled = false; // Re-enable the button
-}
   function renderDogGallery() {
     dogGallery.innerHTML = '';
 
@@ -159,13 +151,8 @@ function addDogAndSave(newDog, submitBtn) {
   }
 
   function formatDate(dateString) {
-    // Split the date string (YYYY-MM-DD) into parts
     const [year, month, day] = dateString.split('-');
-
-    // Create a new date (months are 0-indexed, so subtract 1)
     const date = new Date(year, month - 1, day);
-
-    // Format in Spanish
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return date.toLocaleDateString('es-ES', options);
   }
