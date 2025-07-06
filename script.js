@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
       formOverlay.classList.remove('visible');
     });
 
-    // Form submission - ONLY ONE EVENT LISTENER
+    // Form submission
     dogForm.addEventListener('submit', handleFormSubmit);
 
     // Close overlay when clicking outside form
@@ -66,6 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function handleFormSubmit(e) {
     e.preventDefault();
     
+    // Get submit button and disable it
     const submitBtn = dogForm.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
     
@@ -79,12 +80,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const photoInput = document.getElementById('photo');
     
+    // If no photo selected, use default image
     if (!photoInput.files || !photoInput.files[0]) {
       newDog.photo = 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400&auto=format&fit=crop';
       addDogAndSave(newDog, submitBtn);
       return;
     }
 
+    // Process the image
     const reader = new FileReader();
     reader.onload = function(e) {
       newDog.photo = e.target.result;
@@ -98,12 +101,12 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function addDogAndSave(newDog, submitBtn) {
-    // Check for duplicate ID before adding
-    if (!dogs.some(dog => dog.id === newDog.id)) {
-      dogs.push(newDog);
-      saveDogs();
-      renderDogGallery();
-    }
+    // Add the dog only once
+    dogs.push(newDog);
+    saveDogs();
+    renderDogGallery();
+    
+    // Reset form and UI
     dogForm.reset();
     formOverlay.classList.remove('visible');
     submitBtn.disabled = false;
@@ -151,8 +154,13 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function formatDate(dateString) {
+    // Split the date string (YYYY-MM-DD) into parts
     const [year, month, day] = dateString.split('-');
+
+    // Create a new date (months are 0-indexed, so subtract 1)
     const date = new Date(year, month - 1, day);
+
+    // Format in Spanish
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return date.toLocaleDateString('es-ES', options);
   }
