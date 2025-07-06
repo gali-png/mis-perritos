@@ -63,25 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
- function handleFormSubmit(e) {
-  e.preventDefault();
-
-  const newDog = {
-    id: Date.now(),
-    name: document.getElementById('name').value,
-    birthdate: document.getElementById('birthdate').value,
-    passedAway: document.getElementById('passedAway').checked,
-    funFacts: document.getElementById('funFacts').value
-  };
-
-  const photoInput = document.getElementById('photo');
-  
-  // If no photo selected, use default image
-  if (!photoInput.files || !photoInput.files[0]) {
-    newDog.photo = 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400&auto=format&fit=crop';
-    addDogAndSave(newDog);
-    return;
-  }
+ 
 
   // Process the image
   const reader = new FileReader();
@@ -92,13 +74,48 @@ document.addEventListener('DOMContentLoaded', function() {
   reader.readAsDataURL(photoInput.files[0]);
 }
 
-// New helper function
-function addDogAndSave(newDog) {
+function handleFormSubmit(e) {
+  e.preventDefault();
+  
+  // Disable submit button to prevent double submissions
+  const submitBtn = dogForm.querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
+  
+  const newDog = {
+    id: Date.now(),
+    name: document.getElementById('name').value,
+    birthdate: document.getElementById('birthdate').value,
+    passedAway: document.getElementById('passedAway').checked,
+    funFacts: document.getElementById('funFacts').value
+  };
+
+  const photoInput = document.getElementById('photo');
+  
+  if (!photoInput.files || !photoInput.files[0]) {
+    newDog.photo = 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400&auto=format&fit=crop';
+    addDogAndSave(newDog, submitBtn);
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    newDog.photo = e.target.result;
+    addDogAndSave(newDog, submitBtn);
+  };
+  reader.onerror = function() {
+    newDog.photo = 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400&auto=format&fit=crop';
+    addDogAndSave(newDog, submitBtn);
+  };
+  reader.readAsDataURL(photoInput.files[0]);
+}
+
+function addDogAndSave(newDog, submitBtn) {
   dogs.push(newDog);
   saveDogs();
   renderDogGallery();
   dogForm.reset();
   formOverlay.classList.remove('visible');
+  submitBtn.disabled = false; // Re-enable the button
 }
   function renderDogGallery() {
     dogGallery.innerHTML = '';
